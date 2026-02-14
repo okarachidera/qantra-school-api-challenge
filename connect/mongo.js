@@ -1,33 +1,48 @@
-const mongoose      = require('mongoose');
-mongoose.Promise    = global.Promise;
+const mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
 
-module.exports = ({uri})=>{
-  //database connection
-  mongoose.connect(uri);
+let listenersBound = false;
 
+module.exports = ({ uri }) => {
+  if (!uri) throw new Error('MongoDB URI is required');
 
-  // When successfully connected
-  mongoose.connection.on('connected', function () {
-    console.log('💾  Mongoose default connection open to ' + uri);
-  });
+  if (mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2) {
+    return mongoose.connection;
+  }
 
-  // If the connection throws an error
-  mongoose.connection.on('error',function (err) {
-    console.log('💾  Mongoose default connection error: ' + err);
-    console.log('=> if using local mongodb: make sure that mongo server is running \n'+
-      '=> if using online mongodb: check your internet connection \n');
-  });
+  if (!listenersBound) {
+    listenersBound = true;
 
-  // When the connection is disconnected
-  mongoose.connection.on('disconnected', function () {
-    console.log('💾  Mongoose default connection disconnected');
-  });
-
-  // If the Node process ends, close the Mongoose connection
-  process.on('SIGINT', function() {
-    mongoose.connection.close(function () {
-      console.log('💾  Mongoose default connection disconnected through app termination');
-      process.exit(0);
+    mongoose.connection.on('connected', () => {
+      console.log('MongoDB connected');
     });
-  });
-}
+
+    mongoose.connection.on('error', (err) => {
+      console.log(`MongoDB connection error: ${err.message || err}`);
+    });
+
+    mongoose.connection.on('disconnected', () => {
+      console.log('MongoDB disconnected');
+    });
+
+    process.once('SIGINT', async () => {
+      try {
+        await mongoose.connection.close();
+        console.log('MongoDB connection closed on app termination');
+      } finally {
+        process.exit(0);
+      }
+    });
+  }
+
+  mongoose
+    .connect(uri, {
+      serverSelectionTimeoutMS: 10000,
+      maxPoolSize: 10,
+    })
+    .catch((err) => {
+      console.log(`MongoDB initial connect failed: ${err.message || err}`);
+    });
+
+  return mongoose.connection;
+};
