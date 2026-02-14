@@ -2,6 +2,7 @@ const http              = require('http');
 const express           = require('express');
 const cors              = require('cors');
 const app               = express();
+const openapiBuilder    = require('../../docs/openapi');
 
 module.exports = class UserServer {
     constructor({config, managers}){
@@ -48,6 +49,7 @@ module.exports = class UserServer {
 
     /** server configs */
     run(){
+        const openapi = openapiBuilder({ port: this.config.dotEnv.USER_PORT });
         app.disable('x-powered-by');
         app.set('trust proxy', 1);
         app.use(cors({origin: '*'}));
@@ -61,6 +63,29 @@ module.exports = class UserServer {
         app.use(express.json({ limit: this.config.dotEnv.REQUEST_BODY_LIMIT }));
         app.use(express.urlencoded({ extended: true, limit: this.config.dotEnv.REQUEST_BODY_LIMIT }));
         app.use('/static', express.static('public'));
+        app.get('/api/docs/openapi.json', (req, res) => res.json(openapi));
+        app.get('/api/docs', (req, res) => {
+            res.type('html').send(`<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>School API Docs</title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+  <script>
+    window.onload = () => {
+      window.ui = SwaggerUIBundle({
+        url: '/api/docs/openapi.json',
+        dom_id: '#swagger-ui'
+      });
+    };
+  </script>
+</body>
+</html>`);
+        });
         app.use('/api', this.apiRateLimiter);
         
         /** a single middleware to handle all */
