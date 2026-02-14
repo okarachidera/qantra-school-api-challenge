@@ -9,6 +9,7 @@ const MongoLoader           = require('./MongoLoader');
 const utils                 = require('../libs/utils');
 
 const TokenManager          = require('../managers/token/Token.manager');
+const AuthManager           = require('../managers/entities/auth/Auth.manager');
 
 /** 
  * load sharable modules
@@ -56,6 +57,7 @@ module.exports = class ManagersLoader {
         const mwsRepo                     = middlewaresLoader.load();
         this.injectable.mwsRepo           = mwsRepo;
         this.managers.token               = new TokenManager(this.injectable);
+        this.managers.auth                = new AuthManager(this.injectable);
         this.managers.mwsExec             = new VirtualStack({ ...{ preStack: [/* '__token', */'__device',] }, ...this.injectable });
         this.managers.userApi             = new ApiHandler({...this.injectable,...{prop:'httpExposed'}});
         this.managers.userServer          = new UserServer({ config: this.config, managers: this.managers });

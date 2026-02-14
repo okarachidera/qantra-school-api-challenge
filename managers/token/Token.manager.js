@@ -36,9 +36,9 @@ module.exports = class TokenManager {
         })
     }
 
-    genShortToken({userId, userKey, sessionId, deviceId}){
+    genShortToken({userId, userKey, sessionId, deviceId, role, schoolId}){
         return jwt.sign(
-            { userKey, userId, sessionId, deviceId}, 
+            { userKey, userId, sessionId, deviceId, role, schoolId }, 
             this.config.dotEnv.SHORT_TOKEN_SECRET, 
             {expiresIn: this.shortTokenExpiresIn
         })
