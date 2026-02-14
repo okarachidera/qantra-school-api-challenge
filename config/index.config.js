@@ -24,6 +24,9 @@ const config                           = require(`./envs/${ENV}.js`);
 const LONG_TOKEN_SECRET                = process.env.LONG_TOKEN_SECRET || null;
 const SHORT_TOKEN_SECRET               = process.env.SHORT_TOKEN_SECRET || null;
 const NACL_SECRET                      = process.env.NACL_SECRET || null;
+const RATE_LIMIT_WINDOW_MS             = Number(process.env.RATE_LIMIT_WINDOW_MS || 60000);
+const RATE_LIMIT_MAX                   = Number(process.env.RATE_LIMIT_MAX || 100);
+const REQUEST_BODY_LIMIT               = process.env.REQUEST_BODY_LIMIT || '1mb';
 
 if(!LONG_TOKEN_SECRET || !SHORT_TOKEN_SECRET || !NACL_SECRET) {
     throw Error('missing .env variables check index.config');
@@ -45,6 +48,9 @@ config.dotEnv = {
     ADMIN_URL,
     LONG_TOKEN_SECRET,
     SHORT_TOKEN_SECRET,
+    RATE_LIMIT_WINDOW_MS,
+    RATE_LIMIT_MAX,
+    REQUEST_BODY_LIMIT,
 };
 
 
