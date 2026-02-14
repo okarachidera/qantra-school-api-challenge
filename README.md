@@ -71,12 +71,6 @@ Minimum required:
 - `token: <token>`
 4. Access protected endpoints based on role rules.
 
-## Auth
-Use JWT as:
-- `Authorization: Bearer <token>`
-or
-- `token: <token>`
-
 ## Endpoints
 
 ### Auth
@@ -184,12 +178,14 @@ npm test
 Current baseline tests:
 - `tests/auth.test.js`: register/login flow
 - `tests/protected-route.test.js`: protected RBAC route behavior
+- `tests/auth-integration.test.js`: JWT + `__auth` middleware integration flow
 
 Example result:
 ```text
 ✔ auth register then login returns token and sanitized user
 ✔ protected route rejects non-allowed role and allows allowed role
-pass 2
+✔ integration: jwt token passes __auth middleware for protected route context
+pass 3
 fail 0
 ```
 
@@ -207,8 +203,8 @@ fail 0
 - One protected endpoint
 
 ## Submission Checklist
-- Public repository URL: `<ADD_REPO_URL>`
-- Deployed API URL: `<ADD_DEPLOYED_URL>`
+- Public repository URL: `https://github.com/okarachidera/qantra-school-api-challenge`
+- Deployed API URL: `https://qantra-school-api-challenge.onrender.com`
 - README includes setup, auth flow, endpoints, errors, schema, tests, deployment notes.
 - Swagger docs accessible at `/api/docs`.
 - Tests pass with `npm test`.
