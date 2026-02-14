@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const { nanoid } = require('nanoid');
 const md5 = require('md5');
 
