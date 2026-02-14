@@ -1,6 +1,8 @@
 const RBAC_RULES = {
     'auth.me': ['superadmin', 'school_admin'],
     'school.createSchool': ['superadmin'],
+    'school.getSchool': ['superadmin'],
+    'school.updateSchool': ['superadmin'],
     'school.deleteSchool': ['superadmin'],
     'school.listSchools': ['superadmin'],
     'user.createSchoolAdmin': ['superadmin'],
