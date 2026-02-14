@@ -1,38 +1,45 @@
-
 require('dotenv').config()
-const os                               = require('os');
 const pjson                            = require('../package.json');
 const utils                            = require('../libs/utils');
-const SERVICE_NAME                     = (process.env.SERVICE_NAME)? utils.slugify(process.env.SERVICE_NAME):pjson.name;
-const USER_PORT                        = process.env.USER_PORT || 5111;
-const ADMIN_PORT                       = process.env.ADMIN_PORT || 5222;
-const ADMIN_URL                        = process.env.ADMIN_URL || `http://localhost:${ADMIN_PORT}`;
-const ENV                              = process.env.ENV || "development";
-const REDIS_URI                        = process.env.REDIS_URI || "redis://127.0.0.1:6379";
+const ENV                              = process.env.ENV || 'development';
+const envConfig                        = require(`./envs/${ENV}.js`);
+const envDefaults                      = envConfig.dotEnv || {};
 
-const CORTEX_REDIS                     = process.env.CORTEX_REDIS || REDIS_URI;
-const CORTEX_PREFIX                    = process.env.CORTEX_PREFIX || 'none';
-const CORTEX_TYPE                      = process.env.CORTEX_TYPE || SERVICE_NAME;
-const OYSTER_REDIS                     = process.env.OYSTER_REDIS || REDIS_URI;
-const OYSTER_PREFIX                    = process.env.OYSTER_PREFIX || 'none';
+const resolve                          = (key, fallback) =>
+    (typeof process.env[key] !== 'undefined' ? process.env[key] :
+        (typeof envDefaults[key] !== 'undefined' ? envDefaults[key] : fallback));
 
-const CACHE_REDIS                      = process.env.CACHE_REDIS || REDIS_URI;
-const CACHE_PREFIX                     = process.env.CACHE_PREFIX || `${SERVICE_NAME}:ch`;
+const SERVICE_NAME                     = process.env.SERVICE_NAME
+    ? utils.slugify(process.env.SERVICE_NAME)
+    : pjson.name;
+const USER_PORT                        = Number(resolve('USER_PORT', 5111));
+const ADMIN_PORT                       = Number(resolve('ADMIN_PORT', 5222));
+const ADMIN_URL                        = resolve('ADMIN_URL', `http://localhost:${ADMIN_PORT}`);
+const REDIS_URI                        = resolve('REDIS_URI', null);
+const REDIS_ENABLED                    = String(resolve('REDIS_ENABLED', 'false')).toLowerCase() === 'true';
 
-const MONGO_URI                        = process.env.MONGO_URI || `mongodb://localhost:27017/${SERVICE_NAME}`;
-const config                           = require(`./envs/${ENV}.js`);
-const LONG_TOKEN_SECRET                = process.env.LONG_TOKEN_SECRET || null;
-const SHORT_TOKEN_SECRET               = process.env.SHORT_TOKEN_SECRET || null;
-const NACL_SECRET                      = process.env.NACL_SECRET || null;
-const RATE_LIMIT_WINDOW_MS             = Number(process.env.RATE_LIMIT_WINDOW_MS || 60000);
-const RATE_LIMIT_MAX                   = Number(process.env.RATE_LIMIT_MAX || 100);
-const REQUEST_BODY_LIMIT               = process.env.REQUEST_BODY_LIMIT || '1mb';
+const CORTEX_REDIS                     = resolve('CORTEX_REDIS', REDIS_URI || null);
+const CORTEX_PREFIX                    = resolve('CORTEX_PREFIX', 'none');
+const CORTEX_TYPE                      = resolve('CORTEX_TYPE', SERVICE_NAME);
+const OYSTER_REDIS                     = resolve('OYSTER_REDIS', REDIS_URI || null);
+const OYSTER_PREFIX                    = resolve('OYSTER_PREFIX', 'none');
+
+const CACHE_REDIS                      = resolve('CACHE_REDIS', REDIS_URI || null);
+const CACHE_PREFIX                     = resolve('CACHE_PREFIX', `${SERVICE_NAME}:ch`);
+
+const MONGO_URI                        = resolve('MONGO_URI', `mongodb://localhost:27017/${SERVICE_NAME}`);
+const LONG_TOKEN_SECRET                = resolve('LONG_TOKEN_SECRET', null);
+const SHORT_TOKEN_SECRET               = resolve('SHORT_TOKEN_SECRET', null);
+const NACL_SECRET                      = resolve('NACL_SECRET', null);
+const RATE_LIMIT_WINDOW_MS             = Number(resolve('RATE_LIMIT_WINDOW_MS', 60000));
+const RATE_LIMIT_MAX                   = Number(resolve('RATE_LIMIT_MAX', 100));
+const REQUEST_BODY_LIMIT               = resolve('REQUEST_BODY_LIMIT', '1mb');
 
 if(!LONG_TOKEN_SECRET || !SHORT_TOKEN_SECRET || !NACL_SECRET) {
     throw Error('missing .env variables check index.config');
 }
 
-config.dotEnv = {
+envConfig.dotEnv = {
     SERVICE_NAME,
     ENV,
     CORTEX_REDIS,
@@ -46,13 +53,15 @@ config.dotEnv = {
     USER_PORT,
     ADMIN_PORT,
     ADMIN_URL,
+    REDIS_ENABLED,
+    REDIS_URI,
     LONG_TOKEN_SECRET,
     SHORT_TOKEN_SECRET,
+    NACL_SECRET,
     RATE_LIMIT_WINDOW_MS,
     RATE_LIMIT_MAX,
     REQUEST_BODY_LIMIT,
 };
 
 
-
-module.exports = config;
+module.exports = envConfig;
