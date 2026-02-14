@@ -13,6 +13,11 @@ module.exports = {
         type: 'String',
         regex: /^[a-fA-F0-9]{24}$/,
     },
+    classroomId: {
+        path: 'classroomId',
+        type: 'String',
+        regex: /^[a-fA-F0-9]{24}$/,
+    },
     name: {
         path: 'name',
         type: 'string',
