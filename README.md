@@ -42,7 +42,7 @@ cp .env.example .env
 
 3. Ensure infrastructure is running:
 - MongoDB
-- Redis
+- Redis (optional, only if `REDIS_ENABLED=true`)
 
 4. Start app:
 ```bash
@@ -57,7 +57,7 @@ Minimum required:
 - `SHORT_TOKEN_SECRET`
 - `NACL_SECRET`
 - `MONGO_URI`
-- Redis URLs (`REDIS_URI` and/or the specific redis vars)
+- Optional Redis stack: `REDIS_ENABLED=true` plus Redis URLs
 
 ## API Docs
 - Swagger UI: `http://localhost:5111/api/docs`
@@ -100,7 +100,8 @@ or
 
 ## Deployment Readiness Notes
 - Configure secrets via environment variables
-- Set production `MONGO_URI` and Redis URLs
+- Set production `MONGO_URI`
+- Optional: set Redis URLs and `REDIS_ENABLED=true` if using Redis stack
 - Tune:
   - `RATE_LIMIT_WINDOW_MS`
   - `RATE_LIMIT_MAX`
