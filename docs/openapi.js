@@ -235,14 +235,19 @@ module.exports = ({ port }) => ({
         '/api/student/updateStudent': {
             put: {
                 tags: ['Student'],
-                summary: 'Update student (school_admin)',
+                summary: 'Update student / transfer classroom (school_admin)',
                 security: [{ bearerAuth: [] }],
                 parameters: [{ in: 'query', name: 'studentId', required: true, schema: { type: 'string' } }],
                 requestBody: {
                     required: true,
                     content: { 'application/json': { schema: { $ref: '#/components/schemas/StudentPayload' } } },
                 },
-                responses: { 200: { description: 'Updated' } },
+                responses: {
+                    200: { description: 'Updated' },
+                    401: { description: 'Unauthorized' },
+                    403: { description: 'Forbidden' },
+                    422: { description: 'Validation error' },
+                },
             },
         },
         '/api/student/deleteStudent': {
